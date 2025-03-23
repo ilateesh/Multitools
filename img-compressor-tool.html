@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compressor - AtozSEO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      color: #333;
+    }
+    input[type="file"] {
+      margin: 1rem 0;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-top: 1rem;
+    }
+    .slider-container {
+      margin: 1rem 0;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image Compressor</h1>
+    <input type="file" id="upload" accept="image/*">
+    <div class="slider-container">
+      <label for="quality">Quality: <span id="quality-value">80</span>%</label>
+      <input type="range" id="quality" min="1" max="100" value="80">
+    </div>
+    <button id="compress-btn">Compress Image</button>
+    <div class="preview">
+      <img id="preview-image" src="#" alt="Compressed Image Preview" style="display: none;">
+    </div>
+    <a id="download-link" style="display: none;">Download Compressed Image</a>
+  </div>
+
+  <script>
+    const uploadInput = document.getElementById('upload');
+    const qualitySlider = document.getElementById('quality');
+    const qualityValue = document.getElementById('quality-value');
+    const compressBtn = document.getElementById('compress-btn');
+    const previewImage = document.getElementById('preview-image');
+    const downloadLink = document.getElementById('download-link');
+
+    qualitySlider.addEventListener('input', () => {
+      qualityValue.textContent = qualitySlider.value;
+    });
+
+    compressBtn.addEventListener('click', async () => {
+      const file = uploadInput.files[0];
+      if (!file) {
+        alert('Please upload an image first.');
+        return;
+      }
+
+      const quality = qualitySlider.value / 100;
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+        initialQuality: quality,
+      };
+
+      try {
+        const compressedFile = await imageCompression(file, options);
+        const url = URL.createObjectURL(compressedFile);
+        previewImage.src = url;
+        previewImage.style.display = 'block';
+        downloadLink.href = url;
+        downloadLink.download = `compressed_${file.name}`;
+        downloadLink.style.display = 'block';
+      } catch (error) {
+        console.error('Error compressing image:', error);
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression/dist/browser-image-compression.min.js"></script>
+</body>
+</html>
